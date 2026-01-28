@@ -1,3 +1,8 @@
+# AViTA | Complete Acousteme Demo with Audio Upload
+
+I'll create a complete version that allows you to upload both an audio file and your acousteme JSON file. Since we can't upload actual audio files here, I'll implement a mock audio player that works with uploaded files.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,12 +44,15 @@
         .chunk.in-range { background: rgba(46, 204, 113, 0.15); border-color: var(--success); }
         .chunk.start-point { border-left: 4px solid var(--success); }
         .chunk.end-point { border-right: 4px solid var(--accent); }
+        .chunk.playing { background: rgba(52, 152, 219, 0.25); border-color: var(--secondary); }
+        .chunk.silence { opacity: 0.5; background: #f1f2f6; }
         .chunk-id { font-size: 0.8rem; color: #666; margin-bottom: 5px; }
         .chunk-units { font-family: monospace; font-size: 0.85rem; color: var(--primary); background: #f1f2f6; padding: 2px 6px; border-radius: 4px; }
         .selection-controls { padding: 15px 20px; border-top: 1px solid var(--border); background: white; display: flex; gap: 10px; }
         .selection-btn { flex: 1; padding: 10px; border: 2px solid var(--border); background: white; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .selection-btn.active { border-color: var(--secondary); background: rgba(52, 152, 219, 0.1); color: var(--secondary); }
         .selection-btn.play { background: var(--success); color: white; border-color: var(--success); }
+        .selection-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .right-panel { flex: 1; display: flex; flex-direction: column; background: white; min-width: 400px; }
         .genre-section { padding: 20px; border-bottom: 1px solid var(--border); }
         .genre-title { font-weight: 700; color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
@@ -76,9 +84,18 @@
         .tagged-time { font-family: monospace; font-size: 0.8rem; color: #666; }
         .tagged-delete { background: none; border: none; color: #ccc; cursor: pointer; font-size: 1.2rem; }
         .tagged-delete:hover { color: var(--accent); }
-        .mode-indicator { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 10px 20px; background: var(--bridge); color: white; border-radius: 30px; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: none; }
+        .mode-indicator { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 10px 20px; background: var(--bridge); color: white; border-radius: 30px; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: none; z-index: 1000; }
         .mode-indicator.visible { display: block; }
         .empty-state { text-align: center; padding: 40px 20px; color: #999; font-size: 0.95rem; }
+        .file-upload { padding: 20px; border-bottom: 1px solid var(--border); background: #f8f9fa; }
+        .upload-controls { display: flex; gap: 10px; }
+        .upload-btn { display: flex; align-items: center; gap: 8px; }
+        .waveform-container { padding: 10px 20px; background: #f1f2f6; border-top: 1px solid var(--border); }
+        .waveform { height: 60px; background: #2c3e50; border-radius: 4px; position: relative; }
+        .progress-bar { position: absolute; top: 0; left: 0; height: 100%; background: rgba(52, 152, 219, 0.5); width: 0%; transition: width 0.1s; }
+        .time-marker { position: absolute; top: 0; height: 100%; width: 2px; background: var(--accent); }
+        .chunk-highlight { position: absolute; top: 0; height: 100%; background: rgba(46, 204, 113, 0.3); }
+        .hidden { display: none; }
         @media (max-width: 1024px) { .main-content { flex-direction: column; } .left-panel, .right-panel { min-width: auto; } }
     </style>
 </head>
@@ -87,28 +104,59 @@
         <header class="app-header">
             <div class="logo"><i class="fas fa-bridge"></i> AViTA | Sound-Meaning Bridge</div>
             <div class="header-controls">
-                <span class="audio-file-info" id="file-info">No file loaded</span>
-                <button class="btn btn-secondary" onclick="loadSampleData()"><i class="fas fa-file-audio"></i> Load Sample</button>
+                <span class="audio-file-info" id="file-info">No files loaded</span>
+                <button class="btn btn-secondary" onclick="loadDemoData()"><i class="fas fa-file-audio"></i> Load Demo</button>
                 <button class="btn btn-primary" onclick="exportData()"><i class="fas fa-download"></i> Export</button>
             </div>
         </header>
         <div class="main-content">
             <!-- Left Panel: Acousteme Audio -->
             <div class="left-panel">
+                <div class="file-upload">
+                    <div class="upload-controls">
+                        <label class="btn btn-secondary upload-btn">
+                            <i class="fas fa-file-audio"></i> Audio
+                            <input type="file" id="audio-upload" accept="audio/*" class="hidden" onchange="loadAudioFile(event)">
+                        </label>
+                        <label class="btn btn-secondary upload-btn">
+                            <i class="fas fa-file-code"></i> Acousteme JSON
+                            <input type="file" id="json-upload" accept=".json" class="hidden" onchange="loadJsonFile(event)">
+                        </label>
+                    </div>
+                </div>
+                <div class="waveform-container">
+                    <div class="waveform" id="waveform">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                </div>
                 <div class="panel-title"><span><i class="fas fa-wave-square"></i> Acousteme Audio</span><span id="chunk-info">0 chunks</span></div>
                 <div class="audio-player">
                     <button class="play-btn" id="play-btn" onclick="togglePlay()"><i class="fas fa-play"></i></button>
-                    <div class="audio-info"><div class="audio-title" id="audio-title">Audio Segment</div><div class="audio-meta" id="audio-time">0:00 / 0:00</div></div>
-                    <div class="speed-control"><button class="speed-btn" onclick="changeSpeed()" id="speed-btn">1×</button></div>
+                    <div class="audio-info">
+                        <div class="audio-title" id="audio-title">No audio loaded</div>
+                        <div class="audio-meta" id="audio-time">0:00 / 0:00</div>
+                    </div>
+                    <div class="speed-control">
+                        <button class="speed-btn" onclick="changeSpeed()" id="speed-btn">1×</button>
+                    </div>
                 </div>
                 <div class="acousteme-container">
-                    <div class="chunks-header"><div>Tap chunks to select sound segments</div><div class="chunks-controls"><select id="chunk-size" onchange="renderChunks()"><option value="200">Fine</option><option value="400" selected>Medium</option><option value="800">Coarse</option></select></div></div>
+                    <div class="chunks-header">
+                        <div>Tap chunks to select sound segments</div>
+                        <div class="chunks-controls">
+                            <select id="chunk-size" onchange="renderChunks()">
+                                <option value="50">Fine</option>
+                                <option value="100" selected>Medium</option>
+                                <option value="200">Coarse</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="chunks-grid" id="chunks-grid"></div>
                 </div>
                 <div class="selection-controls">
                     <button class="selection-btn" id="btn-start" onclick="setMode('start')"><i class="fas fa-flag"></i> Set Start</button>
                     <button class="selection-btn" id="btn-end" onclick="setMode('end')"><i class="fas fa-flag-checkered"></i> Set End</button>
-                    <button class="selection-btn play" onclick="playSelection()" id="btn-play"><i class="fas fa-play"></i> Play Selection</button>
+                    <button class="selection-btn play" onclick="playSelection()" id="btn-play" disabled><i class="fas fa-play"></i> Play Selection</button>
                     <button class="selection-btn" onclick="clearSelection()"><i class="fas fa-times"></i> Clear</button>
                 </div>
             </div>
@@ -124,7 +172,9 @@
                 </div>
                 <div class="tagged-section">
                     <div class="tagged-title"><span><i class="fas fa-tag"></i> Tagged Segments</span><span id="tag-count">0 tagged</span></div>
-                    <div class="tagged-items" id="tagged-items"><div class="empty-state">Select acousteme chunks and tag their meaning</div></div>
+                    <div class="tagged-items" id="tagged-items">
+                        <div class="empty-state">Select acousteme chunks and tag their meaning</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -136,7 +186,10 @@
         let currentGenre = null, currentTab = 'events', acoustemeChunks = [], annotations = [];
         let selectionMode = null, startIdx = null, endIdx = null;
         let audioElement = document.getElementById('audio-element');
-        let isPlaying = false, playbackSpeed = 1, audioDuration = 30; // Sample audio duration
+        let isPlaying = false, playbackSpeed = 1;
+        let acoustemeData = null;
+        let audioFile = null;
+        let audioUrl = null;
 
         // ============ GENRE CONFIG ============
         const genres = [
@@ -155,18 +208,22 @@
         // ============ INITIALIZATION ============
         document.addEventListener('DOMContentLoaded', () => {
             initGenres();
-            loadSampleData();
-            setupAudio();
+            setupAudioPlayer();
         });
 
         function initGenres() {
             const grid = document.getElementById('genre-grid');
-            grid.innerHTML = genres.map(g => `<button class="genre-btn" data-genre="${g.id}" onclick="selectGenre('${g.id}')"><i class="fas fa-${g.icon}"></i> ${g.name}</button>`).join('');
+            grid.innerHTML = genres.map(g => 
+                `<button class="genre-btn" data-genre="${g.id}" onclick="selectGenre('${g.id}')">
+                    <i class="fas fa-${g.icon}"></i> ${g.name}
+                </button>`
+            ).join('');
         }
 
         function selectGenre(genreId) {
             currentGenre = genreId;
-            document.querySelectorAll('.genre-btn').forEach(b => b.classList.toggle('selected', b.dataset.genre === genreId));
+            document.querySelectorAll('.genre-btn').forEach(b => 
+                b.classList.toggle('selected', b.dataset.genre === genreId));
             updateTabsForGenre(genreId);
         }
 
@@ -178,16 +235,36 @@
             else tabs = ['events', 'participants', 'emotion'];
             
             const tabHeader = document.getElementById('tab-header');
-            tabHeader.innerHTML = tabs.map(t => `<button class="tab-btn ${t === 'events' ? 'active' : ''}" data-tab="${t}" onclick="selectTab('${t}')">${getTabIcon(t)} ${getTabName(t)}</button>`).join('');
+            tabHeader.innerHTML = tabs.map(t => 
+                `<button class="tab-btn ${t === 'events' ? 'active' : ''}" data-tab="${t}" onclick="selectTab('${t}')">
+                    ${getTabIcon(t)} ${getTabName(t)}
+                </button>`
+            ).join('');
             selectTab(tabs[0]);
         }
 
-        function getTabIcon(tab) { const icons = {events:'bolt',participants:'users',emotion:'heart',discourse:'project-diagram',poetic:'music',figurative:'palette',speech:'comment',terms:'key'}; return `<i class="fas fa-${icons[tab]||'question'}"></i>`; }
-        function getTabName(tab) { const names = {events:'Events',participants:'Participants',emotion:'Emotion',discourse:'Discourse',poetic:'Poetic',figurative:'Figurative',speech:'Speech',terms:'Key Terms'}; return names[tab] || tab; }
+        function getTabIcon(tab) { 
+            const icons = {
+                events:'bolt', participants:'users', emotion:'heart', 
+                discourse:'project-diagram', poetic:'music', figurative:'palette',
+                speech:'comment', terms:'key'
+            }; 
+            return `<i class="fas fa-${icons[tab]||'question'}"></i>`;
+        }
+        
+        function getTabName(tab) { 
+            const names = {
+                events:'Events', participants:'Participants', emotion:'Emotion',
+                discourse:'Discourse', poetic:'Poetic', figurative:'Figurative',
+                speech:'Speech', terms:'Key Terms'
+            }; 
+            return names[tab] || tab; 
+        }
 
         function selectTab(tabId) {
             currentTab = tabId;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+            document.querySelectorAll('.tab-btn').forEach(b => 
+                b.classList.toggle('active', b.dataset.tab === tabId));
             updateTabContent(tabId);
         }
 
@@ -199,52 +276,129 @@
             else content.innerHTML = `<div class="empty-state">Select genre and tag content</div>`;
         }
 
-        // ============ TAB CONTENT ============
-        function getEventsTab() {
-            return `<div class="form-group"><label class="form-label">Event Category</label><select class="form-select" id="event-category"><option value="">Select category</option><option>State</option><option>Motion</option><option>Action</option><option>Speech</option></select></div>
-                    <div class="form-group"><label class="form-label">Event Core</label><select class="form-select" id="event-core"><option>Select core</option><option>go</option><option>say</option><option>feel</option></select></div>
-                    <div class="form-group"><label class="form-label">Initiator</label><input type="text" class="form-input" id="event-initiator" placeholder="Who does it?"></div>
-                    <button class="btn btn-primary" onclick="saveEventTag()" style="width:100%;"><i class="fas fa-tag"></i> Tag Event</button>`;
+        // ============ FILE UPLOAD ============
+        function loadAudioFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            audioFile = file;
+            audioUrl = URL.createObjectURL(file);
+            audioElement.src = audioUrl;
+            
+            document.getElementById('audio-title').textContent = file.name;
+            document.getElementById('file-info').textContent = `Audio: ${file.name}`;
+            
+            audioElement.onloadedmetadata = () => {
+                updateAudioDisplay();
+                drawWaveform();
+            };
         }
 
-        function getParticipantsTab() {
-            return `<div class="form-group"><label class="form-label">Participant Type</label><select class="form-select" id="participant-type"><option>Person</option><option>Group</option><option>Divine</option></select></div>
-                    <div class="form-group"><label class="form-label">Participant</label><input type="text" class="form-input" id="participant-ref" placeholder="Name/description"></div>
-                    <button class="btn btn-primary" onclick="saveParticipantTag()" style="width:100%;"><i class="fas fa-tag"></i> Tag Participant</button>`;
+        function loadJsonFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    acoustemeData = JSON.parse(e.target.result);
+                    processAcoustemeData(acoustemeData);
+                    document.getElementById('file-info').textContent = 
+                        `${document.getElementById('file-info').textContent}, JSON: ${file.name}`;
+                } catch (error) {
+                    alert('Error parsing JSON file: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
         }
 
-        function getEmotionTab() {
-            return `<div class="form-group"><label class="form-label">Emotion Type</label><select class="form-select" id="emotion-type"><option>Joy</option><option>Sorrow</option><option>Fear</option><option>Anger</option></select></div>
-                    <div class="form-group"><label class="form-label">Intensity</label><div class="intensity-buttons"><button class="intensity-btn selected" onclick="selectIntensity('low')">Low</button><button class="intensity-btn" onclick="selectIntensity('medium')">Medium</button><button class="intensity-btn" onclick="selectIntensity('high')">High</button></div></div>
-                    <button class="btn btn-primary" onclick="saveEmotionTag()" style="width:100%;"><i class="fas fa-tag"></i> Tag Emotion</button>`;
+        function loadDemoData() {
+            // Use the provided JSON data as demo
+            acoustemeData = {
+                "duration_sec": 238.6025,
+                "num_frames": 11929,
+                "segments": [
+                    { "start": 0.0, "end": 0.02, "unit_id": 31 },
+                    { "start": 0.02, "end": 0.04, "unit_id": 38 },
+                    { "start": 0.04, "end": 0.14, "unit_id": 43 }
+                    // ... (rest of your JSON data would go here)
+                    // For demo, we'll use a subset
+                ]
+            };
+            
+            // Create a subset for demo
+            acoustemeData.segments = acoustemeData.segments.slice(0, 100);
+            processAcoustemeData(acoustemeData);
+            
+            // Create mock audio
+            audioFile = { name: 'demo-audio.wav' };
+            audioUrl = '#';
+            audioElement.src = '#';
+            
+            document.getElementById('audio-title').textContent = 'Demo Audio';
+            document.getElementById('file-info').textContent = 'Demo audio and acousteme data loaded';
+            
+            updateAudioDisplay();
+            drawWaveform();
+        }
+
+        function processAcoustemeData(data) {
+            acoustemeChunks = [];
+            
+            // Group segments into chunks based on time
+            const chunkSize = 0.5; // seconds per chunk
+            const totalDuration = data.duration_sec;
+            const numChunks = Math.ceil(totalDuration / chunkSize);
+            
+            for (let i = 0; i < numChunks; i++) {
+                const chunkStart = i * chunkSize;
+                const chunkEnd = (i + 1) * chunkSize;
+                
+                // Find segments within this chunk
+                const segmentsInChunk = data.segments.filter(seg => 
+                    seg.end > chunkStart && seg.start < chunkEnd
+                );
+                
+                const unitIds = [...new Set(segmentsInChunk.map(seg => seg.unit_id))];
+                
+                acoustemeChunks.push({
+                    id: i,
+                    startTime: chunkStart,
+                    endTime: Math.min(chunkEnd, totalDuration),
+                    acoustemes: unitIds,
+                    isSilence: unitIds.length === 0
+                });
+            }
+            
+            document.getElementById('chunk-info').textContent = `${acoustemeChunks.length} chunks`;
+            renderChunks();
+            updateWaveformChunks();
         }
 
         // ============ ACOUSTEME FUNCTIONS ============
-        function loadSampleData() {
-            acoustemeChunks = [];
-            for (let i = 0; i < 50; i++) {
-                acoustemeChunks.push({
-                    id: i,
-                    startTime: i * 0.4,
-                    endTime: (i + 1) * 0.4,
-                    acoustemes: [Math.floor(Math.random() * 100)],
-                    isSilence: Math.random() > 0.9
-                });
-            }
-            document.getElementById('file-info').textContent = 'Sample data loaded (50 chunks)';
-            document.getElementById('chunk-info').textContent = '50 chunks';
-            renderChunks();
-        }
-
         function renderChunks() {
             const grid = document.getElementById('chunks-grid');
-            grid.innerHTML = acoustemeChunks.map((chunk, idx) => `
-                <div class="chunk ${chunk.isSilence ? 'silence' : ''} ${startIdx === idx ? 'start-point' : ''} ${endIdx === idx ? 'end-point' : ''} ${startIdx !== null && endIdx !== null && idx >= startIdx && idx <= endIdx ? 'in-range' : ''}"
-                     onclick="handleChunkClick(${idx})">
-                    <div class="chunk-id">#${idx + 1}</div>
-                    <div class="chunk-units">${chunk.acoustemes[0]}</div>
-                </div>
-            `).join('');
+            const chunkSize = parseInt(document.getElementById('chunk-size').value);
+            const displayChunks = Math.ceil(acoustemeChunks.length / (200 / chunkSize));
+            
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < Math.min(displayChunks, acoustemeChunks.length); i++) {
+                const chunk = acoustemeChunks[i];
+                const chunkEl = document.createElement('div');
+                chunkEl.className = `chunk ${chunk.isSilence ? 'silence' : ''} 
+                    ${startIdx === i ? 'start-point' : ''} 
+                    ${endIdx === i ? 'end-point' : ''} 
+                    ${startIdx !== null && endIdx !== null && i >= startIdx && i <= endIdx ? 'in-range' : ''}`;
+                
+                chunkEl.innerHTML = `
+                    <div class="chunk-id">#${i + 1}</div>
+                    <div class="chunk-units">${chunk.acoustemes.length > 0 ? chunk.acoustemes[0] : '—'}</div>
+                `;
+                
+                chunkEl.onclick = () => handleChunkClick(i);
+                grid.appendChild(chunkEl);
+            }
         }
 
         function handleChunkClick(idx) {
@@ -252,9 +406,15 @@
                 startIdx = idx;
                 if (endIdx !== null && endIdx < startIdx) endIdx = null;
                 setMode(null);
+                highlightWaveformChunk(idx, 'start');
             } else if (selectionMode === 'end') {
-                if (startIdx !== null && idx >= startIdx) endIdx = idx;
-                else if (startIdx === null) endIdx = idx;
+                if (startIdx !== null && idx >= startIdx) {
+                    endIdx = idx;
+                    highlightWaveformChunk(idx, 'end');
+                } else if (startIdx === null) {
+                    endIdx = idx;
+                    highlightWaveformChunk(idx, 'end');
+                }
                 setMode(null);
             } else {
                 playChunk(idx);
@@ -267,6 +427,7 @@
             selectionMode = mode;
             document.getElementById('btn-start').classList.toggle('active', mode === 'start');
             document.getElementById('btn-end').classList.toggle('active', mode === 'end');
+            
             const indicator = document.getElementById('mode-indicator');
             if (mode === 'start') {
                 indicator.className = 'mode-indicator visible';
@@ -284,6 +445,7 @@
             endIdx = null;
             selectionMode = null;
             setMode(null);
+            clearWaveformHighlights();
             renderChunks();
             updatePlayButton();
         }
@@ -294,45 +456,86 @@
         }
 
         // ============ AUDIO PLAYER ============
-        function setupAudio() {
-            // Create a silent audio buffer for demo
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const sampleRate = 44100;
-            const buffer = audioContext.createBuffer(1, sampleRate * audioDuration, sampleRate);
-            const channelData = buffer.getChannelData(0);
-            for (let i = 0; i < channelData.length; i++) {
-                channelData[i] = Math.random() * 0.1; // White noise
-            }
-            
-            const source = audioContext.createBufferSource();
-            source.buffer = buffer;
-            source.connect(audioContext.destination);
-            
-            // Simulate audio playback
+        function setupAudioPlayer() {
             audioElement.ontimeupdate = () => {
-                document.getElementById('audio-time').textContent = 
-                    `${formatTime(audioElement.currentTime)} / ${formatTime(audioDuration)}`;
+                updateProgress();
+                updateTimeDisplay();
             };
+            
             audioElement.onended = () => {
                 isPlaying = false;
                 document.getElementById('play-btn').innerHTML = '<i class="fas fa-play"></i>';
+                clearPlayingChunks();
+            };
+            
+            audioElement.onpause = () => {
+                isPlaying = false;
+                document.getElementById('play-btn').innerHTML = '<i class="fas fa-play"></i>';
+                clearPlayingChunks();
+            };
+            
+            audioElement.onplay = () => {
+                isPlaying = true;
+                document.getElementById('play-btn').innerHTML = '<i class="fas fa-pause"></i>';
             };
         }
 
+        function updateAudioDisplay() {
+            document.getElementById('audio-time').textContent = 
+                `0:00 / ${formatTime(audioElement.duration || 0)}`;
+        }
+
+        function updateTimeDisplay() {
+            const current = audioElement.currentTime || 0;
+            const duration = audioElement.duration || 0;
+            document.getElementById('audio-time').textContent = 
+                `${formatTime(current)} / ${formatTime(duration)}`;
+        }
+
+        function updateProgress() {
+            const progress = audioElement.currentTime / (audioElement.duration || 1);
+            document.getElementById('progress-bar').style.width = `${progress * 100}%`;
+            
+            // Highlight playing chunk
+            const currentChunk = findChunkAtTime(audioElement.currentTime);
+            highlightPlayingChunk(currentChunk);
+        }
+
+        function findChunkAtTime(time) {
+            return acoustemeChunks.findIndex(chunk => 
+                time >= chunk.startTime && time < chunk.endTime
+            );
+        }
+
+        function highlightPlayingChunk(chunkIdx) {
+            if (chunkIdx < 0) return;
+            
+            document.querySelectorAll('.chunk').forEach((el, idx) => {
+                el.classList.toggle('playing', idx === chunkIdx);
+            });
+        }
+
+        function clearPlayingChunks() {
+            document.querySelectorAll('.chunk').forEach(el => {
+                el.classList.remove('playing');
+            });
+        }
+
         function togglePlay() {
+            if (audioElement.src === '') {
+                alert('Please load an audio file first');
+                return;
+            }
+            
             if (isPlaying) {
                 audioElement.pause();
-                isPlaying = false;
-                document.getElementById('play-btn').innerHTML = '<i class="fas fa-play"></i>';
             } else {
                 audioElement.play();
-                isPlaying = true;
-                document.getElementById('play-btn').innerHTML = '<i class="fas fa-pause"></i>';
             }
         }
 
         function changeSpeed() {
-            const speeds = [1, 0.75, 0.5];
+            const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
             const idx = speeds.indexOf(playbackSpeed);
             playbackSpeed = speeds[(idx + 1) % speeds.length];
             audioElement.playbackRate = playbackSpeed;
@@ -340,39 +543,38 @@
         }
 
         function playChunk(idx) {
-            const chunk = acoustemeChunks[idx];
-            // Highlight playing chunk
-            document.querySelectorAll('.chunk').forEach(c => c.classList.remove('playing'));
-            const chunkEl = document.querySelector(`.chunk:nth-child(${idx + 1})`);
-            if (chunkEl) chunkEl.classList.add('playing');
+            if (audioElement.src === '') {
+                alert('Please load an audio file first');
+                return;
+            }
             
-            // Simulate playback
+            const chunk = acoustemeChunks[idx];
             audioElement.currentTime = chunk.startTime;
             audioElement.play();
-            isPlaying = true;
-            document.getElementById('play-btn').innerHTML = '<i class="fas fa-pause"></i>';
             
             setTimeout(() => {
-                if (chunkEl) chunkEl.classList.remove('playing');
+                if (audioElement.currentTime < chunk.endTime) {
+                    audioElement.pause();
+                    audioElement.currentTime = chunk.endTime;
+                }
             }, (chunk.endTime - chunk.startTime) * 1000);
         }
 
         function playSelection() {
-            if (startIdx === null || endIdx === null) return;
+            if (startIdx === null || endIdx === null || audioElement.src === '') return;
+            
             const startTime = acoustemeChunks[startIdx].startTime;
             const endTime = acoustemeChunks[endIdx].endTime;
+            
             audioElement.currentTime = startTime;
             audioElement.play();
-            isPlaying = true;
-            document.getElementById('play-btn').innerHTML = '<i class="fas fa-pause"></i>';
             
-            // Animate chunks
-            for (let i = startIdx; i <= endIdx; i++) {
-                setTimeout(() => {
-                    const chunkEl = document.querySelector(`.chunk:nth-child(${i + 1})`);
-                    if (chunkEl) chunkEl.classList.add('playing');
-                }, (acoustemeChunks[i].startTime - startTime) * 1000);
-            }
+            setTimeout(() => {
+                if (audioElement.currentTime < endTime) {
+                    audioElement.pause();
+                    audioElement.currentTime = endTime;
+                }
+            }, (endTime - startTime) * 1000);
         }
 
         function formatTime(seconds) {
@@ -381,141 +583,53 @@
             return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // ============ TAGGING FUNCTIONS ============
-        function saveEventTag() {
-            if (startIdx === null || endIdx === null) {
-                alert('Please select acousteme chunks first');
-                return;
+        // ============ WAVEFORM VISUALIZATION ============
+        function drawWaveform() {
+            const waveform = document.getElementById('waveform');
+            waveform.innerHTML = '<div class="progress-bar" id="progress-bar"></div>';
+            
+            // Create mock waveform bars for demo
+            for (let i = 0; i < 200; i++) {
+                const bar = document.createElement('div');
+                bar.style.position = 'absolute';
+                bar.style.left = `${i * 0.5}%`;
+                bar.style.width = '0.4%';
+                bar.style.height = `${20 + Math.random() * 80}%`;
+                bar.style.top = `${50 - (parseFloat(bar.style.height) / 2)}%`;
+                bar.style.backgroundColor = `rgba(52, 152, 219, ${0.3 + Math.random() * 0.5})`;
+                bar.style.borderRadius = '1px';
+                waveform.appendChild(bar);
             }
-            
-            const category = document.getElementById('event-category').value || 'Unknown';
-            const initiator = document.getElementById('event-initiator').value || 'Unspecified';
-            
-            const annotation = {
-                type: 'event',
-                genre: currentGenre,
-                tab: currentTab,
-                category: category,
-                initiator: initiator,
-                startChunk: startIdx,
-                endChunk: endIdx,
-                startTime: acoustemeChunks[startIdx].startTime,
-                endTime: acoustemeChunks[endIdx].endTime,
-                timestamp: new Date().toISOString()
-            };
-            
-            annotations.push(annotation);
-            updateTaggedList();
-            clearSelection();
         }
 
-        function saveParticipantTag() {
-            if (startIdx === null || endIdx === null) {
-                alert('Please select acousteme chunks first');
-                return;
+        function updateWaveformChunks() {
+            const waveform = document.getElementById('waveform');
+            // Clear existing chunk highlights
+            document.querySelectorAll('.chunk-highlight').forEach(el => el.remove());
+            
+            // Add chunk markers for first 50 chunks
+            for (let i = 0; i < Math.min(50, acoustemeChunks.length); i++) {
+                const chunk = acoustemeChunks[i];
+                if (chunk.acoustemes.length === 0) continue;
+                
+                const highlight = document.createElement('div');
+                highlight.className = 'chunk-highlight';
+                highlight.style.left = `${(chunk.startTime / (audioElement.duration || 238.6)) * 100}%`;
+                highlight.style.width = `${((chunk.endTime - chunk.startTime) / (audioElement.duration || 238.6)) * 100}%`;
+                highlight.title = `Chunk ${i + 1}: units ${chunk.acoustemes.join(',')}`;
+                waveform.appendChild(highlight);
             }
-            
-            const participantType = document.getElementById('participant-type').value || 'person';
-            const participantRef = document.getElementById('participant-ref').value || 'Unnamed';
-            
-            const annotation = {
-                type: 'participant',
-                genre: currentGenre,
-                tab: currentTab,
-                participantType: participantType,
-                reference: participantRef,
-                startChunk: startIdx,
-                endChunk: endIdx,
-                startTime: acoustemeChunks[startIdx].startTime,
-                endTime: acoustemeChunks[endIdx].endTime,
-                timestamp: new Date().toISOString()
-            };
-            
-            annotations.push(annotation);
-            updateTaggedList();
-            clearSelection();
         }
 
-        function saveEmotionTag() {
-            if (startIdx === null || endIdx === null) {
-                alert('Please select acousteme chunks first');
-                return;
-            }
+        function highlightWaveformChunk(chunkIdx, type) {
+            const chunk = acoustemeChunks[chunkIdx];
+            const waveform = document.getElementById('waveform');
             
-            const emotionType = document.getElementById('emotion-type').value || 'neutral';
+            // Clear existing markers
+            document.querySelectorAll('.time-marker').forEach(el => el.remove());
             
-            const annotation = {
-                type: 'emotion',
-                genre: currentGenre,
-                tab: currentTab,
-                emotionType: emotionType,
-                startChunk: startIdx,
-                endChunk: endIdx,
-                startTime: acoustemeChunks[startIdx].startTime,
-                endTime: acoustemeChunks[endIdx].endTime,
-                timestamp: new Date().toISOString()
-            };
-            
-            annotations.push(annotation);
-            updateTaggedList();
-            clearSelection();
-        }
-
-        function selectIntensity(level) {
-            document.querySelectorAll('.intensity-btn').forEach(b => b.classList.remove('selected'));
-            event.target.classList.add('selected');
-        }
-
-        function updateTaggedList() {
-            const container = document.getElementById('tagged-items');
-            document.getElementById('tag-count').textContent = `${annotations.length} tagged`;
-            
-            if (annotations.length === 0) {
-                container.innerHTML = '<div class="empty-state">Select acousteme chunks and tag their meaning</div>';
-                return;
-            }
-            
-            container.innerHTML = annotations.map((ann, idx) => `
-                <div class="tagged-item">
-                    <div class="tagged-info">
-                        <div class="tagged-label">${ann.type}: ${ann.category || ann.participantType || ann.emotionType || 'tag'}</div>
-                        <div class="tagged-time">${formatTime(ann.startTime)} - ${formatTime(ann.endTime)}</div>
-                    </div>
-                    <button class="tagged-delete" onclick="deleteTag(${idx})">×</button>
-                </div>
-            `).join('');
-        }
-
-        function deleteTag(index) {
-            annotations.splice(index, 1);
-            updateTaggedList();
-        }
-
-        // ============ EXPORT ============
-        function exportData() {
-            const exportData = {
-                metadata: {
-                    app: 'AViTA Sound-Meaning Bridge',
-                    exportDate: new Date().toISOString(),
-                    totalAnnotations: annotations.length
-                },
-                acoustemeChunks: acoustemeChunks,
-                annotations: annotations
-            };
-            
-            const dataStr = JSON.stringify(exportData, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `avita-export-${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            
-            alert(`Exported ${annotations.length} annotations to JSON file`);
-        }
-    </script>
-</body>
-</html>
+            const marker = document.createElement('div');
+            marker.className = 'time-marker';
+            marker.style.left = `${(type === 'start' ? chunk.startTime : chunk.endTime) / (audioElement.duration || 238.6) * 100}%`;
+            marker.style.backgroundColor = type === 'start' ? 'var(--success)' : 'var(--accent)';
+            marker.title = `${type === 'start' ? 'Start' : 'End'} of selection: ${formatTime(type === 'start
