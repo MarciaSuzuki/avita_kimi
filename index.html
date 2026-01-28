@@ -6,1074 +6,240 @@
     <title>AViTA | Sound-Meaning Bridge</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --bridge: #f39c12;
-            --success: #27ae60;
-            --light: #ecf0f1;
-            --dark: #2c3e50;
-            --border: #bdc3c7;
-            --bg: #f8f9fa;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg);
-            color: #333;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        /* Header */
-        .app-header {
-            background: white;
-            padding: 12px 20px;
-            border-bottom: 2px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            color: var(--primary);
-            font-size: 1.2rem;
-        }
-
+        /* Complete CSS included inline */
+        :root { --primary: #2c3e50; --secondary: #3498db; --accent: #e74c3c; --bridge: #f39c12; --success: #27ae60; --light: #ecf0f1; --dark: #2c3e50; --border: #bdc3c7; --bg: #f8f9fa; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #333; height: 100vh; overflow: hidden; }
+        .app-container { display: flex; flex-direction: column; height: 100vh; }
+        .app-header { background: white; padding: 12px 20px; border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--primary); font-size: 1.2rem; }
         .logo i { color: var(--bridge); }
-
-        .header-controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: var(--secondary);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: var(--light);
-            color: var(--dark);
-            border: 1px solid var(--border);
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .audio-file-info {
-            font-size: 0.85rem;
-            color: #666;
-            background: var(--light);
-            padding: 4px 12px;
-            border-radius: 20px;
-        }
-
-        /* Main Content */
-        .main-content {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        /* Left Panel - Acousteme Audio */
-        .left-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: white;
-            border-right: 1px solid var(--border);
-            min-width: 400px;
-        }
-
-        .panel-title {
-            padding: 15px 20px;
-            font-weight: 700;
-            color: var(--primary);
-            border-bottom: 1px solid var(--border);
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .panel-title i { color: var(--secondary); }
-
-        /* Audio Player */
-        .audio-player {
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .play-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--secondary);
-            border: none;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-
-        .audio-info {
-            flex: 1;
-        }
-
-        .audio-title {
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--primary);
-        }
-
-        .audio-meta {
-            font-size: 0.85rem;
-            color: #666;
-            font-family: monospace;
-        }
-
-        .speed-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .speed-btn {
-            background: var(--light);
-            border: 1px solid var(--border);
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        /* Acousteme Chunks */
-        .acousteme-container {
-            padding: 20px;
-            flex: 1;
-            overflow-y: auto;
-            background: #f8f9fa;
-        }
-
-        .chunks-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .chunks-controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .chunks-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .chunk {
-            padding: 10px 12px;
-            background: white;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: center;
-            min-width: 60px;
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        .chunk:hover {
-            border-color: var(--secondary);
-            transform: translateY(-2px);
-        }
-
-        .chunk.selected {
-            background: rgba(52, 152, 219, 0.15);
-            border-color: var(--secondary);
-            font-weight: 700;
-        }
-
-        .chunk.in-range {
-            background: rgba(46, 204, 113, 0.15);
-            border-color: var(--success);
-        }
-
-        .chunk.start-point {
-            border-left: 4px solid var(--success);
-        }
-
-        .chunk.end-point {
-            border-right: 4px solid var(--accent);
-        }
-
-        .chunk-id {
-            font-size: 0.8rem;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .chunk-units {
-            font-family: monospace;
-            font-size: 0.85rem;
-            color: var(--primary);
-            background: #f1f2f6;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        /* Selection Controls */
-        .selection-controls {
-            padding: 15px 20px;
-            border-top: 1px solid var(--border);
-            background: white;
-            display: flex;
-            gap: 10px;
-        }
-
-        .selection-btn {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid var(--border);
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .selection-btn.active {
-            border-color: var(--secondary);
-            background: rgba(52, 152, 219, 0.1);
-            color: var(--secondary);
-        }
-
-        .selection-btn.play {
-            background: var(--success);
-            color: white;
-            border-color: var(--success);
-        }
-
-        /* Right Panel - Semantic Tagging */
-        .right-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: white;
-            min-width: 400px;
-        }
-
-        /* Genre Selection */
-        .genre-section {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .genre-title {
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .genre-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        .genre-btn {
-            padding: 12px;
-            border: 2px solid var(--border);
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: center;
-            font-weight: 600;
-            color: #555;
-            transition: all 0.2s;
-        }
-
-        .genre-btn:hover {
-            border-color: var(--secondary);
-        }
-
-        .genre-btn.selected {
-            background: var(--secondary);
-            color: white;
-            border-color: var(--secondary);
-        }
-
-        /* Semantic Tagging Interface */
-        .tagging-interface {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .tab-header {
-            display: flex;
-            background: #f8f9fa;
-            border-bottom: 1px solid var(--border);
-            overflow-x: auto;
-        }
-
-        .tab-btn {
-            padding: 15px 20px;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            font-weight: 600;
-            color: #666;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .tab-btn:hover {
-            color: var(--primary);
-            background: rgba(0,0,0,0.03);
-        }
-
-        .tab-btn.active {
-            color: var(--secondary);
-            border-bottom-color: var(--secondary);
-            background: white;
-        }
-
-        .tab-content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--primary);
-            font-size: 0.95rem;
-        }
-
-        .form-select, .form-input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 0.95rem;
-        }
-
-        .checkbox-group, .radio-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .checkbox-item, .radio-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            padding: 8px 12px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            border: 1px solid transparent;
-        }
-
-        .checkbox-item:hover, .radio-item:hover {
-            border-color: var(--secondary);
-        }
-
-        .intensity-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .intensity-btn {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            border: 2px solid var(--border);
-            border-radius: 6px;
-            background: white;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .intensity-btn.selected {
-            background: var(--secondary);
-            color: white;
-            border-color: var(--secondary);
-        }
-
-        /* Tagged Items */
-        .tagged-section {
-            border-top: 1px solid var(--border);
-            padding: 20px;
-        }
-
-        .tagged-title {
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .tagged-items {
-            max-height: 200px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .tagged-item {
-            padding: 10px 12px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            border-left: 4px solid var(--success);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .tagged-info {
-            flex: 1;
-        }
-
-        .tagged-label {
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .tagged-time {
-            font-family: monospace;
-            font-size: 0.8rem;
-            color: #666;
-        }
-
-        .tagged-delete {
-            background: none;
-            border: none;
-            color: #ccc;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        .tagged-delete:hover {
-            color: var(--accent);
-        }
-
-        /* Mode Indicator */
-        .mode-indicator {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            background: var(--bridge);
-            color: white;
-            border-radius: 30px;
-            font-weight: 700;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            display: none;
-        }
-
-        .mode-indicator.visible {
-            display: block;
-        }
-
-        /* Empty States */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #999;
-            font-size: 0.95rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .main-content {
-                flex-direction: column;
-            }
-            .left-panel, .right-panel {
-                min-width: auto;
-            }
-        }
+        .header-controls { display: flex; gap: 10px; align-items: center; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; }
+        .btn-primary { background: var(--secondary); color: white; }
+        .btn-secondary { background: var(--light); color: var(--dark); border: 1px solid var(--border); }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .audio-file-info { font-size: 0.85rem; color: #666; background: var(--light); padding: 4px 12px; border-radius: 20px; }
+        .main-content { display: flex; flex: 1; overflow: hidden; }
+        .left-panel { flex: 1; display: flex; flex-direction: column; background: white; border-right: 1px solid var(--border); min-width: 400px; }
+        .panel-title { padding: 15px 20px; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border); background: #f8f9fa; display: flex; align-items: center; justify-content: space-between; }
+        .audio-player { padding: 20px; display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--border); }
+        .play-btn { width: 50px; height: 50px; border-radius: 50%; background: var(--secondary); border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .audio-info { flex: 1; }
+        .audio-title { font-weight: 700; font-size: 1rem; color: var(--primary); }
+        .audio-meta { font-size: 0.85rem; color: #666; font-family: monospace; }
+        .speed-control { display: flex; align-items: center; gap: 10px; }
+        .speed-btn { background: var(--light); border: 1px solid var(--border); padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+        .acousteme-container { padding: 20px; flex: 1; overflow-y: auto; background: #f8f9fa; }
+        .chunks-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .chunks-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .chunk { padding: 10px 12px; background: white; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; text-align: center; min-width: 60px; transition: all 0.2s; }
+        .chunk:hover { border-color: var(--secondary); transform: translateY(-2px); }
+        .chunk.selected { background: rgba(52, 152, 219, 0.15); border-color: var(--secondary); }
+        .chunk.in-range { background: rgba(46, 204, 113, 0.15); border-color: var(--success); }
+        .chunk.start-point { border-left: 4px solid var(--success); }
+        .chunk.end-point { border-right: 4px solid var(--accent); }
+        .chunk-id { font-size: 0.8rem; color: #666; margin-bottom: 5px; }
+        .chunk-units { font-family: monospace; font-size: 0.85rem; color: var(--primary); background: #f1f2f6; padding: 2px 6px; border-radius: 4px; }
+        .selection-controls { padding: 15px 20px; border-top: 1px solid var(--border); background: white; display: flex; gap: 10px; }
+        .selection-btn { flex: 1; padding: 10px; border: 2px solid var(--border); background: white; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .selection-btn.active { border-color: var(--secondary); background: rgba(52, 152, 219, 0.1); color: var(--secondary); }
+        .selection-btn.play { background: var(--success); color: white; border-color: var(--success); }
+        .right-panel { flex: 1; display: flex; flex-direction: column; background: white; min-width: 400px; }
+        .genre-section { padding: 20px; border-bottom: 1px solid var(--border); }
+        .genre-title { font-weight: 700; color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .genre-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .genre-btn { padding: 12px; border: 2px solid var(--border); background: white; border-radius: 8px; cursor: pointer; text-align: center; font-weight: 600; color: #555; transition: all 0.2s; }
+        .genre-btn:hover { border-color: var(--secondary); }
+        .genre-btn.selected { background: var(--secondary); color: white; border-color: var(--secondary); }
+        .tagging-interface { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .tab-header { display: flex; background: #f8f9fa; border-bottom: 1px solid var(--border); overflow-x: auto; }
+        .tab-btn { padding: 15px 20px; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; font-weight: 600; color: #666; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+        .tab-btn:hover { color: var(--primary); background: rgba(0,0,0,0.03); }
+        .tab-btn.active { color: var(--secondary); border-bottom-color: var(--secondary); background: white; }
+        .tab-content { flex: 1; padding: 20px; overflow-y: auto; display: none; }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary); font-size: 0.95rem; }
+        .form-select, .form-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; }
+        .checkbox-group, .radio-group { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px; }
+        .checkbox-item, .radio-item { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; background: #f8f9fa; border-radius: 6px; border: 1px solid transparent; }
+        .intensity-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        .intensity-btn { flex: 1; padding: 10px; text-align: center; border: 2px solid var(--border); border-radius: 6px; background: white; cursor: pointer; font-weight: 600; }
+        .intensity-btn.selected { background: var(--secondary); color: white; border-color: var(--secondary); }
+        .tagged-section { border-top: 1px solid var(--border); padding: 20px; }
+        .tagged-title { font-weight: 700; color: var(--primary); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .tagged-items { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .tagged-item { padding: 10px 12px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid var(--success); display: flex; justify-content: space-between; align-items: center; }
+        .tagged-info { flex: 1; }
+        .tagged-label { font-weight: 700; color: var(--primary); }
+        .tagged-time { font-family: monospace; font-size: 0.8rem; color: #666; }
+        .tagged-delete { background: none; border: none; color: #ccc; cursor: pointer; font-size: 1.2rem; }
+        .tagged-delete:hover { color: var(--accent); }
+        .mode-indicator { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 10px 20px; background: var(--bridge); color: white; border-radius: 30px; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: none; }
+        .mode-indicator.visible { display: block; }
+        .empty-state { text-align: center; padding: 40px 20px; color: #999; font-size: 0.95rem; }
+        @media (max-width: 1024px) { .main-content { flex-direction: column; } .left-panel, .right-panel { min-width: auto; } }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
         <header class="app-header">
-            <div class="logo">
-                <i class="fas fa-bridge"></i>
-                AViTA | Sound-Meaning Bridge
-            </div>
+            <div class="logo"><i class="fas fa-bridge"></i> AViTA | Sound-Meaning Bridge</div>
             <div class="header-controls">
                 <span class="audio-file-info" id="file-info">No file loaded</span>
-                <button class="btn btn-secondary" onclick="loadSampleData()">
-                    <i class="fas fa-file-audio"></i> Load Sample
-                </button>
-                <button class="btn btn-primary" onclick="exportData()">
-                    <i class="fas fa-download"></i> Export
-                </button>
+                <button class="btn btn-secondary" onclick="loadSampleData()"><i class="fas fa-file-audio"></i> Load Sample</button>
+                <button class="btn btn-primary" onclick="exportData()"><i class="fas fa-download"></i> Export</button>
             </div>
         </header>
-
-        <!-- Main Content -->
         <div class="main-content">
             <!-- Left Panel: Acousteme Audio -->
             <div class="left-panel">
-                <div class="panel-title">
-                    <span><i class="fas fa-wave-square"></i> Acousteme Audio</span>
-                    <span id="chunk-info">0 chunks</span>
-                </div>
-
-                <!-- Audio Player -->
+                <div class="panel-title"><span><i class="fas fa-wave-square"></i> Acousteme Audio</span><span id="chunk-info">0 chunks</span></div>
                 <div class="audio-player">
-                    <button class="play-btn" id="play-btn" onclick="togglePlay()">
-                        <i class="fas fa-play"></i>
-                    </button>
-                    <div class="audio-info">
-                        <div class="audio-title" id="audio-title">Audio Segment</div>
-                        <div class="audio-meta" id="audio-time">0:00 / 0:00</div>
-                    </div>
-                    <div class="speed-control">
-                        <button class="speed-btn" onclick="changeSpeed()" id="speed-btn">1×</button>
-                    </div>
+                    <button class="play-btn" id="play-btn" onclick="togglePlay()"><i class="fas fa-play"></i></button>
+                    <div class="audio-info"><div class="audio-title" id="audio-title">Audio Segment</div><div class="audio-meta" id="audio-time">0:00 / 0:00</div></div>
+                    <div class="speed-control"><button class="speed-btn" onclick="changeSpeed()" id="speed-btn">1×</button></div>
                 </div>
-
-                <!-- Acousteme Chunks -->
                 <div class="acousteme-container">
-                    <div class="chunks-header">
-                        <div>Tap chunks to select sound segments</div>
-                        <div class="chunks-controls">
-                            <select id="chunk-size" onchange="renderChunks()">
-                                <option value="200">Fine</option>
-                                <option value="400" selected>Medium</option>
-                                <option value="800">Coarse</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="chunks-grid" id="chunks-grid">
-                        <!-- Chunks will be rendered here -->
-                    </div>
+                    <div class="chunks-header"><div>Tap chunks to select sound segments</div><div class="chunks-controls"><select id="chunk-size" onchange="renderChunks()"><option value="200">Fine</option><option value="400" selected>Medium</option><option value="800">Coarse</option></select></div></div>
+                    <div class="chunks-grid" id="chunks-grid"></div>
                 </div>
-
-                <!-- Selection Controls -->
                 <div class="selection-controls">
-                    <button class="selection-btn" id="btn-start" onclick="setMode('start')">
-                        <i class="fas fa-flag"></i> Set Start
-                    </button>
-                    <button class="selection-btn" id="btn-end" onclick="setMode('end')">
-                        <i class="fas fa-flag-checkered"></i> Set End
-                    </button>
-                    <button class="selection-btn play" onclick="playSelection()" id="btn-play">
-                        <i class="fas fa-play"></i> Play Selection
-                    </button>
-                    <button class="selection-btn" onclick="clearSelection()">
-                        <i class="fas fa-times"></i> Clear
-                    </button>
+                    <button class="selection-btn" id="btn-start" onclick="setMode('start')"><i class="fas fa-flag"></i> Set Start</button>
+                    <button class="selection-btn" id="btn-end" onclick="setMode('end')"><i class="fas fa-flag-checkered"></i> Set End</button>
+                    <button class="selection-btn play" onclick="playSelection()" id="btn-play"><i class="fas fa-play"></i> Play Selection</button>
+                    <button class="selection-btn" onclick="clearSelection()"><i class="fas fa-times"></i> Clear</button>
                 </div>
             </div>
-
             <!-- Right Panel: Semantic Tagging -->
             <div class="right-panel">
-                <!-- Genre Selection -->
                 <div class="genre-section">
-                    <div class="genre-title">
-                        <i class="fas fa-tags"></i> What type of speech is this?
-                    </div>
-                    <div class="genre-grid" id="genre-grid">
-                        <!-- Genres populated by JS -->
-                    </div>
+                    <div class="genre-title"><i class="fas fa-tags"></i> What type of speech is this?</div>
+                    <div class="genre-grid" id="genre-grid"></div>
                 </div>
-
-                <!-- Semantic Tagging Interface -->
                 <div class="tagging-interface">
-                    <div class="tab-header" id="tab-header">
-                        <!-- Tabs populated based on genre -->
-                    </div>
-                    <div class="tab-content active" id="tab-content">
-                        <!-- Content populated based on tab -->
-                    </div>
+                    <div class="tab-header" id="tab-header"></div>
+                    <div class="tab-content active" id="tab-content"></div>
                 </div>
-
-                <!-- Tagged Items -->
                 <div class="tagged-section">
-                    <div class="tagged-title">
-                        <span><i class="fas fa-tag"></i> Tagged Segments</span>
-                        <span id="tag-count">0 tagged</span>
-                    </div>
-                    <div class="tagged-items" id="tagged-items">
-                        <div class="empty-state">
-                            Select acousteme chunks and tag their meaning
-                        </div>
-                    </div>
+                    <div class="tagged-title"><span><i class="fas fa-tag"></i> Tagged Segments</span><span id="tag-count">0 tagged</span></div>
+                    <div class="tagged-items" id="tagged-items"><div class="empty-state">Select acousteme chunks and tag their meaning</div></div>
                 </div>
             </div>
         </div>
-
-        <!-- Mode Indicator -->
-        <div class="mode-indicator" id="mode-indicator">
-            Tap a chunk to set start point
-        </div>
+        <div class="mode-indicator" id="mode-indicator">Tap a chunk to set start point</div>
     </div>
-
-    <!-- Audio Element -->
     <audio id="audio-element" style="display: none;"></audio>
-
     <script>
         // ============ STATE ============
-        let currentGenre = null;
-        let currentTab = 'events';
-        let acoustemeChunks = [];
-        let annotations = [];
-        let selectionMode = null;
-        let startIdx = null;
-        let endIdx = null;
-        
+        let currentGenre = null, currentTab = 'events', acoustemeChunks = [], annotations = [];
+        let selectionMode = null, startIdx = null, endIdx = null;
         let audioElement = document.getElementById('audio-element');
-        let isPlaying = false;
-        let playbackSpeed = 1;
+        let isPlaying = false, playbackSpeed = 1, audioDuration = 30; // Sample audio duration
 
-        // ============ GENRE CONFIGURATION ============
+        // ============ GENRE CONFIG ============
         const genres = [
-            { id: 'narrative', name: 'Narrative', icon: 'book', color: '#3498db' },
-            { id: 'poetry', name: 'Poetry/Song', icon: 'music', color: '#9b59b6' },
-            { id: 'teaching', name: 'Teaching', icon: 'chalkboard-teacher', color: '#2ecc71' },
-            { id: 'dialogue', name: 'Dialogue', icon: 'comments', color: '#f39c12' },
-            { id: 'procedural', name: 'Procedural', icon: 'list-ol', color: '#1abc9c' },
-            { id: 'descriptive', name: 'Descriptive', icon: 'eye', color: '#34495e' },
-            { id: 'testimony', name: 'Testimony', icon: 'user-check', color: '#e74c3c' },
-            { id: 'proverb', name: 'Proverb', icon: 'lightbulb', color: '#f1c40f' },
-            { id: 'prayer', name: 'Prayer', icon: 'pray', color: '#7f8c8d' },
-            { id: 'ceremonial', name: 'Ceremonial', icon: 'place-of-worship', color: '#8e44ad' }
+            { id: 'narrative', name: 'Narrative', icon: 'book' },
+            { id: 'poetry', name: 'Poetry/Song', icon: 'music' },
+            { id: 'teaching', name: 'Teaching', icon: 'chalkboard-teacher' },
+            { id: 'dialogue', name: 'Dialogue', icon: 'comments' },
+            { id: 'procedural', name: 'Procedural', icon: 'list-ol' },
+            { id: 'descriptive', name: 'Descriptive', icon: 'eye' },
+            { id: 'testimony', name: 'Testimony', icon: 'user-check' },
+            { id: 'proverb', name: 'Proverb', icon: 'lightbulb' },
+            { id: 'prayer', name: 'Prayer', icon: 'pray' },
+            { id: 'ceremonial', name: 'Ceremonial', icon: 'place-of-worship' }
         ];
 
         // ============ INITIALIZATION ============
         document.addEventListener('DOMContentLoaded', () => {
             initGenres();
             loadSampleData();
+            setupAudio();
         });
 
         function initGenres() {
             const grid = document.getElementById('genre-grid');
-            grid.innerHTML = genres.map(genre => `
-                <button class="genre-btn" data-genre="${genre.id}" onclick="selectGenre('${genre.id}')">
-                    <i class="fas fa-${genre.icon}"></i> ${genre.name}
-                </button>
-            `).join('');
+            grid.innerHTML = genres.map(g => `<button class="genre-btn" data-genre="${g.id}" onclick="selectGenre('${g.id}')"><i class="fas fa-${g.icon}"></i> ${g.name}</button>`).join('');
         }
 
         function selectGenre(genreId) {
             currentGenre = genreId;
-            
-            // Update genre buttons
-            document.querySelectorAll('.genre-btn').forEach(btn => {
-                btn.classList.toggle('selected', btn.dataset.genre === genreId);
-            });
-
-            // Update tabs based on genre
+            document.querySelectorAll('.genre-btn').forEach(b => b.classList.toggle('selected', b.dataset.genre === genreId));
             updateTabsForGenre(genreId);
         }
 
         function updateTabsForGenre(genreId) {
-            const tabHeader = document.getElementById('tab-header');
             let tabs = [];
-
-            switch(genreId) {
-                case 'narrative':
-                    tabs = ['events', 'participants', 'emotion', 'discourse', 'pragmatic'];
-                    break;
-                case 'poetry':
-                    tabs = ['poetic', 'figurative', 'emotion', 'sound'];
-                    break;
-                case 'teaching':
-                    tabs = ['speech', 'terms', 'discourse', 'pragmatic'];
-                    break;
-                case 'dialogue':
-                    tabs = ['speech', 'participants', 'social', 'emotion'];
-                    break;
-                case 'procedural':
-                    tabs = ['events', 'sequence', 'aspect'];
-                    break;
-                case 'descriptive':
-                    tabs = ['participants', 'properties', 'spatial'];
-                    break;
-                case 'testimony':
-                    tabs = ['emotion', 'evidence', 'events'];
-                    break;
-                case 'proverb':
-                    tabs = ['wisdom', 'function', 'authority'];
-                    break;
-                case 'prayer':
-                    tabs = ['speech', 'emotion', 'divine'];
-                    break;
-                case 'ceremonial':
-                    tabs = ['ritual', 'speech', 'social'];
-                    break;
-                default:
-                    tabs = ['events', 'participants', 'emotion'];
-            }
-
-            tabHeader.innerHTML = tabs.map(tab => `
-                <button class="tab-btn ${tab === 'events' ? 'active' : ''}" 
-                        data-tab="${tab}" 
-                        onclick="selectTab('${tab}')">
-                    ${getTabIcon(tab)} ${getTabName(tab)}
-                </button>
-            `).join('');
-
+            if (genreId === 'narrative') tabs = ['events', 'participants', 'emotion', 'discourse'];
+            else if (genreId === 'poetry') tabs = ['poetic', 'figurative', 'emotion'];
+            else if (genreId === 'teaching') tabs = ['speech', 'terms', 'discourse'];
+            else tabs = ['events', 'participants', 'emotion'];
+            
+            const tabHeader = document.getElementById('tab-header');
+            tabHeader.innerHTML = tabs.map(t => `<button class="tab-btn ${t === 'events' ? 'active' : ''}" data-tab="${t}" onclick="selectTab('${t}')">${getTabIcon(t)} ${getTabName(t)}</button>`).join('');
             selectTab(tabs[0]);
         }
 
-        function getTabIcon(tab) {
-            const icons = {
-                events: 'bolt',
-                participants: 'users',
-                emotion: 'heart',
-                discourse: 'project-diagram',
-                pragmatic: 'comments',
-                poetic: 'music',
-                figurative: 'palette',
-                sound: 'volume-up',
-                speech: 'comment',
-                terms: 'key',
-                sequence: 'stream',
-                aspect: 'hourglass-half',
-                properties: 'list',
-                spatial: 'map-marker-alt',
-                evidence: 'eye',
-                wisdom: 'lightbulb',
-                function: 'cogs',
-                authority: 'crown',
-                ritual: 'place-of-worship',
-                social: 'handshake',
-                divine: 'star'
-            };
-            return `<i class="fas fa-${icons[tab] || 'question'}"></i>`;
-        }
-
-        function getTabName(tab) {
-            const names = {
-                events: 'Events',
-                participants: 'Participants',
-                emotion: 'Emotion',
-                discourse: 'Discourse',
-                pragmatic: 'Pragmatic',
-                poetic: 'Poetic',
-                figurative: 'Figurative',
-                sound: 'Sound',
-                speech: 'Speech',
-                terms: 'Key Terms',
-                sequence: 'Sequence',
-                aspect: 'Aspect',
-                properties: 'Properties',
-                spatial: 'Spatial',
-                evidence: 'Evidence',
-                wisdom: 'Wisdom',
-                function: 'Function',
-                authority: 'Authority',
-                ritual: 'Ritual',
-                social: 'Social',
-                divine: 'Divine'
-            };
-            return names[tab] || tab;
-        }
+        function getTabIcon(tab) { const icons = {events:'bolt',participants:'users',emotion:'heart',discourse:'project-diagram',poetic:'music',figurative:'palette',speech:'comment',terms:'key'}; return `<i class="fas fa-${icons[tab]||'question'}"></i>`; }
+        function getTabName(tab) { const names = {events:'Events',participants:'Participants',emotion:'Emotion',discourse:'Discourse',poetic:'Poetic',figurative:'Figurative',speech:'Speech',terms:'Key Terms'}; return names[tab] || tab; }
 
         function selectTab(tabId) {
             currentTab = tabId;
-            
-            // Update tab buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.tab === tabId);
-            });
-
-            // Update tab content
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
             updateTabContent(tabId);
         }
 
         function updateTabContent(tabId) {
             const content = document.getElementById('tab-content');
-            
-            switch(tabId) {
-                case 'events':
-                    content.innerHTML = getEventsTab();
-                    break;
-                case 'participants':
-                    content.innerHTML = getParticipantsTab();
-                    break;
-                case 'emotion':
-                    content.innerHTML = getEmotionTab();
-                    break;
-                case 'discourse':
-                    content.innerHTML = getDiscourseTab();
-                    break;
-                case 'pragmatic':
-                    content.innerHTML = getPragmaticTab();
-                    break;
-                case 'poetic':
-                    content.innerHTML = getPoeticTab();
-                    break;
-                case 'figurative':
-                    content.innerHTML = getFigurativeTab();
-                    break;
-                case 'sound':
-                    content.innerHTML = getSoundTab();
-                    break;
-                case 'speech':
-                    content.innerHTML = getSpeechTab();
-                    break;
-                case 'terms':
-                    content.innerHTML = getTermsTab();
-                    break;
-                default:
-                    content.innerHTML = `<div class="empty-state">Select genre and tag content</div>`;
-            }
+            if (tabId === 'events') content.innerHTML = getEventsTab();
+            else if (tabId === 'participants') content.innerHTML = getParticipantsTab();
+            else if (tabId === 'emotion') content.innerHTML = getEmotionTab();
+            else content.innerHTML = `<div class="empty-state">Select genre and tag content</div>`;
         }
 
-        // ============ TAB CONTENT GENERATORS ============
+        // ============ TAB CONTENT ============
         function getEventsTab() {
-            return `
-                <div class="form-group">
-                    <label class="form-label">Event Category</label>
-                    <select class="form-select" id="event-category">
-                        <option value="">Select category</option>
-                        <option value="STATE">State/Condition</option>
-                        <option value="MOTION">Motion/Movement</option>
-                        <option value="ACTION">Action/Activity</option>
-                        <option value="SPEECH">Speech/Communication</option>
-                        <option value="INTERNAL">Internal/Mental</option>
-                        <option value="TRANSFER">Transfer/Exchange</option>
-                        <option value="PROCESS">Process/Change</option>
-                        <option value="RITUAL">Ritual/Ceremony</option>
-                        <option value="META">Meta/Commentary</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Event Core</label>
-                    <select class="form-select" id="event-core">
-                        <option value="">Select event core</option>
-                        <!-- Populated based on category -->
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Initiator (Who does it?)</label>
-                    <input type="text" class="form-input" id="event-initiator" placeholder="Person/entity performing action">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Affected (Who/what is acted upon?)</label>
-                    <input type="text" class="form-input" id="event-affected" placeholder="Person/entity receiving action">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Reality</label>
-                    <div class="radio-group">
-                        <label class="radio-item">
-                            <input type="radio" name="reality" value="actual" checked> Actual
-                        </label>
-                        <label class="radio-item">
-                            <input type="radio" name="reality" value="potential"> Potential
-                        </label>
-                        <label class="radio-item">
-                            <input type="radio" name="reality" value="hypothetical"> Hypothetical
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Time Frame</label>
-                    <select class="form-select" id="time-frame">
-                        <option value="retrospective">Past</option>
-                        <option value="immediate">Present</option>
-                        <option value="prospective">Future</option>
-                        <option value="gnomic">Timeless</option>
-                    </select>
-                </div>
-                <button class="btn btn-primary" onclick="saveEventTag()" style="width: 100%;">
-                    <i class="fas fa-tag"></i> Tag Event
-                </button>
-            `;
+            return `<div class="form-group"><label class="form-label">Event Category</label><select class="form-select" id="event-category"><option value="">Select category</option><option>State</option><option>Motion</option><option>Action</option><option>Speech</option></select></div>
+                    <div class="form-group"><label class="form-label">Event Core</label><select class="form-select" id="event-core"><option>Select core</option><option>go</option><option>say</option><option>feel</option></select></div>
+                    <div class="form-group"><label class="form-label">Initiator</label><input type="text" class="form-input" id="event-initiator" placeholder="Who does it?"></div>
+                    <button class="btn btn-primary" onclick="saveEventTag()" style="width:100%;"><i class="fas fa-tag"></i> Tag Event</button>`;
         }
 
         function getParticipantsTab() {
-            return `
-                <div class="form-group">
-                    <label class="form-label">Participant Type</label>
-                    <select class="form-select" id="participant-type">
-                        <option value="">Select type</option>
-                        <option value="person">Person/Human</option>
-                        <option value="group">Group/Collective</option>
-                        <option value="divine">Divine Being</option>
-                        <option value="animal">Animal</option>
-                        <option value="place">Place/Location</option>
-                        <option value="thing">Thing/Object</option>
-                        <option value="abstract">Abstract Concept</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Participant Reference</label>
-                    <input type="text" class="form-input" id="participant-ref" placeholder="Name or description">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Quantity</label>
-                    <div class="radio-group">
-                        <label class="radio-item"><input type="radio" name="quantity" value="one"> One</label>
-                        <label class="radio-item"><input type="radio" name="quantity" value="few"> Few (3-10)</label>
-                        <label class="radio-item"><input type="radio" name="quantity" value="many"> Many</label>
-                        <label class="radio-item"><input type="radio" name="quantity" value="all"> All</label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Character Properties</label>
-                    <div class="checkbox-group">
-                        <label class="checkbox-item"><input type="checkbox" value="wise"> Wise</label>
-                        <label class="checkbox-item"><input type="checkbox" value="foolish"> Foolish</label>
-                        <label class="checkbox-item"><input type="checkbox" value="righteous"> Righteous</label>
-                        <label class="checkbox-item"><input type="checkbox" value="wicked"> Wicked</label>
-                        <label class="checkbox-item"><input type="checkbox" value="faithful"> Faithful</label>
-                    </div>
-                </div>
-                <button class="btn btn-primary" onclick="saveParticipantTag()" style="width: 100%;">
-                    <i class="fas fa-tag"></i> Tag Participant
-                </button>
-            `;
+            return `<div class="form-group"><label class="form-label">Participant Type</label><select class="form-select" id="participant-type"><option>Person</option><option>Group</option><option>Divine</option></select></div>
+                    <div class="form-group"><label class="form-label">Participant</label><input type="text" class="form-input" id="participant-ref" placeholder="Name/description"></div>
+                    <button class="btn btn-primary" onclick="saveParticipantTag()" style="width:100%;"><i class="fas fa-tag"></i> Tag Participant</button>`;
         }
 
         function getEmotionTab() {
-            return `
-                <div class="form-group">
-                    <label class="form-label">Emotion Type</label>
-                    <select class="form-select" id="emotion-type">
-                        <option value="">Select emotion</option>
-                        <option value="joy">Joy</option>
-                        <option value="sorrow">Sorrow</option>
-                        <option value="fear">Fear</option>
-                        <option value="anger">Anger</option>
-                        <option value="love">Love</option>
-                        <option value="hope">Hope</option>
-                        <option value="despair">Despair</option>
-                        <option value="peace">Peace</option>
-                        <option value="anxiety">Anxiety</option>
-                        <option value="awe">Awe</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Intensity</label>
-                    <div class="intensity-buttons">
-                        <button class="intensity-btn" onclick="selectIntensity('low')">Low</button>
-                        <button class="intensity-btn" onclick="selectIntensity('medium')">Medium</button>
-                        <button class="intensity-btn selected" onclick="selectIntensity('high')">High</button>
-                        <button class="intensity-btn" onclick="selectIntensity('extreme')">Extreme</button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Whose Emotion?</label>
-                    <input type="text" class="form-input" id="emotion-owner" placeholder="Speaker, character, or narrator">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Evidence Source</label>
-                    <div class="radio-group">
-                        <label class="radio-item"><input type="radio" name="evidence" value="lexical"> Lexical</label>
-                        <label class="radio-item"><input type="radio" name="evidence" value="contextual"> Contextual</label>
-                        <label class="radio-item"><input type="radio" name="evidence" value="behavioral"> Behavioral</label>
-                        <label class="radio-item"><input type="radio" name="evidence" value="inferred"> Inferred</label>
-                    </div>
-                </div>
-                <button class="btn btn-primary" onclick="saveEmotionTag()" style="width: 100%;">
-                    <i class="fas fa-tag"></i> Tag Emotion
-                </button>
-            `;
+            return `<div class="form-group"><label class="form-label">Emotion Type</label><select class="form-select" id="emotion-type"><option>Joy</option><option>Sorrow</option><option>Fear</option><option>Anger</option></select></div>
+                    <div class="form-group"><label class="form-label">Intensity</label><div class="intensity-buttons"><button class="intensity-btn selected" onclick="selectIntensity('low')">Low</button><button class="intensity-btn" onclick="selectIntensity('medium')">Medium</button><button class="intensity-btn" onclick="selectIntensity('high')">High</button></div></div>
+                    <button class="btn btn-primary" onclick="saveEmotionTag()" style="width:100%;"><i class="fas fa-tag"></i> Tag Emotion</button>`;
         }
 
         // ============ ACOUSTEME FUNCTIONS ============
         function loadSampleData() {
-            // Simulate loading acousteme data
             acoustemeChunks = [];
-            for (let i = 0; i < 30; i++) {
+            for (let i = 0; i < 50; i++) {
                 acoustemeChunks.push({
                     id: i,
                     startTime: i * 0.4,
                     endTime: (i + 1) * 0.4,
                     acoustemes: [Math.floor(Math.random() * 100)],
-                    isSilence: Math.random() > 0.8
+                    isSilence: Math.random() > 0.9
                 });
             }
-            
-            document.getElementById('file-info').textContent = 'Sample data loaded (30 chunks)';
-            document.getElementById('chunk-info').textContent = '30 chunks';
+            document.getElementById('file-info').textContent = 'Sample data loaded (50 chunks)';
+            document.getElementById('chunk-info').textContent = '50 chunks';
             renderChunks();
         }
 
         function renderChunks() {
             const grid = document.getElementById('chunks-grid');
             grid.innerHTML = acoustemeChunks.map((chunk, idx) => `
-                <div class="chunk ${chunk.isSilence ? 'silence' : ''} 
-                            ${startIdx === idx ? 'start-point' : ''}
-                            ${endIdx === idx ? 'end-point' : ''}
-                            ${startIdx !== null && endIdx !== null && idx >= startIdx && idx <= endIdx ? 'in-range' : ''}"
+                <div class="chunk ${chunk.isSilence ? 'silence' : ''} ${startIdx === idx ? 'start-point' : ''} ${endIdx === idx ? 'end-point' : ''} ${startIdx !== null && endIdx !== null && idx >= startIdx && idx <= endIdx ? 'in-range' : ''}"
                      onclick="handleChunkClick(${idx})">
                     <div class="chunk-id">#${idx + 1}</div>
                     <div class="chunk-units">${chunk.acoustemes[0]}</div>
@@ -1084,19 +250,272 @@
         function handleChunkClick(idx) {
             if (selectionMode === 'start') {
                 startIdx = idx;
-                if (endIdx !== null && endIdx < startIdx) {
-                    endIdx = null;
-                }
+                if (endIdx !== null && endIdx < startIdx) endIdx = null;
                 setMode(null);
             } else if (selectionMode === 'end') {
-                if (startIdx !== null && idx >= startIdx) {
-                    endIdx = idx;
-                } else if (startIdx === null) {
-                    endIdx = idx;
-                }
+                if (startIdx !== null && idx >= startIdx) endIdx = idx;
+                else if (startIdx === null) endIdx = idx;
                 setMode(null);
             } else {
-                // Play this chunk
                 playChunk(idx);
             }
-           
+            renderChunks();
+            updatePlayButton();
+        }
+
+        function setMode(mode) {
+            selectionMode = mode;
+            document.getElementById('btn-start').classList.toggle('active', mode === 'start');
+            document.getElementById('btn-end').classList.toggle('active', mode === 'end');
+            const indicator = document.getElementById('mode-indicator');
+            if (mode === 'start') {
+                indicator.className = 'mode-indicator visible';
+                indicator.textContent = 'Tap a chunk to set START point';
+            } else if (mode === 'end') {
+                indicator.className = 'mode-indicator visible';
+                indicator.textContent = 'Tap a chunk to set END point';
+            } else {
+                indicator.className = 'mode-indicator';
+            }
+        }
+
+        function clearSelection() {
+            startIdx = null;
+            endIdx = null;
+            selectionMode = null;
+            setMode(null);
+            renderChunks();
+            updatePlayButton();
+        }
+
+        function updatePlayButton() {
+            const canPlay = startIdx !== null && endIdx !== null;
+            document.getElementById('btn-play').disabled = !canPlay;
+        }
+
+        // ============ AUDIO PLAYER ============
+        function setupAudio() {
+            // Create a silent audio buffer for demo
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const sampleRate = 44100;
+            const buffer = audioContext.createBuffer(1, sampleRate * audioDuration, sampleRate);
+            const channelData = buffer.getChannelData(0);
+            for (let i = 0; i < channelData.length; i++) {
+                channelData[i] = Math.random() * 0.1; // White noise
+            }
+            
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioContext.destination);
+            
+            // Simulate audio playback
+            audioElement.ontimeupdate = () => {
+                document.getElementById('audio-time').textContent = 
+                    `${formatTime(audioElement.currentTime)} / ${formatTime(audioDuration)}`;
+            };
+            audioElement.onended = () => {
+                isPlaying = false;
+                document.getElementById('play-btn').innerHTML = '<i class="fas fa-play"></i>';
+            };
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                audioElement.pause();
+                isPlaying = false;
+                document.getElementById('play-btn').innerHTML = '<i class="fas fa-play"></i>';
+            } else {
+                audioElement.play();
+                isPlaying = true;
+                document.getElementById('play-btn').innerHTML = '<i class="fas fa-pause"></i>';
+            }
+        }
+
+        function changeSpeed() {
+            const speeds = [1, 0.75, 0.5];
+            const idx = speeds.indexOf(playbackSpeed);
+            playbackSpeed = speeds[(idx + 1) % speeds.length];
+            audioElement.playbackRate = playbackSpeed;
+            document.getElementById('speed-btn').textContent = playbackSpeed + '×';
+        }
+
+        function playChunk(idx) {
+            const chunk = acoustemeChunks[idx];
+            // Highlight playing chunk
+            document.querySelectorAll('.chunk').forEach(c => c.classList.remove('playing'));
+            const chunkEl = document.querySelector(`.chunk:nth-child(${idx + 1})`);
+            if (chunkEl) chunkEl.classList.add('playing');
+            
+            // Simulate playback
+            audioElement.currentTime = chunk.startTime;
+            audioElement.play();
+            isPlaying = true;
+            document.getElementById('play-btn').innerHTML = '<i class="fas fa-pause"></i>';
+            
+            setTimeout(() => {
+                if (chunkEl) chunkEl.classList.remove('playing');
+            }, (chunk.endTime - chunk.startTime) * 1000);
+        }
+
+        function playSelection() {
+            if (startIdx === null || endIdx === null) return;
+            const startTime = acoustemeChunks[startIdx].startTime;
+            const endTime = acoustemeChunks[endIdx].endTime;
+            audioElement.currentTime = startTime;
+            audioElement.play();
+            isPlaying = true;
+            document.getElementById('play-btn').innerHTML = '<i class="fas fa-pause"></i>';
+            
+            // Animate chunks
+            for (let i = startIdx; i <= endIdx; i++) {
+                setTimeout(() => {
+                    const chunkEl = document.querySelector(`.chunk:nth-child(${i + 1})`);
+                    if (chunkEl) chunkEl.classList.add('playing');
+                }, (acoustemeChunks[i].startTime - startTime) * 1000);
+            }
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // ============ TAGGING FUNCTIONS ============
+        function saveEventTag() {
+            if (startIdx === null || endIdx === null) {
+                alert('Please select acousteme chunks first');
+                return;
+            }
+            
+            const category = document.getElementById('event-category').value || 'Unknown';
+            const initiator = document.getElementById('event-initiator').value || 'Unspecified';
+            
+            const annotation = {
+                type: 'event',
+                genre: currentGenre,
+                tab: currentTab,
+                category: category,
+                initiator: initiator,
+                startChunk: startIdx,
+                endChunk: endIdx,
+                startTime: acoustemeChunks[startIdx].startTime,
+                endTime: acoustemeChunks[endIdx].endTime,
+                timestamp: new Date().toISOString()
+            };
+            
+            annotations.push(annotation);
+            updateTaggedList();
+            clearSelection();
+        }
+
+        function saveParticipantTag() {
+            if (startIdx === null || endIdx === null) {
+                alert('Please select acousteme chunks first');
+                return;
+            }
+            
+            const participantType = document.getElementById('participant-type').value || 'person';
+            const participantRef = document.getElementById('participant-ref').value || 'Unnamed';
+            
+            const annotation = {
+                type: 'participant',
+                genre: currentGenre,
+                tab: currentTab,
+                participantType: participantType,
+                reference: participantRef,
+                startChunk: startIdx,
+                endChunk: endIdx,
+                startTime: acoustemeChunks[startIdx].startTime,
+                endTime: acoustemeChunks[endIdx].endTime,
+                timestamp: new Date().toISOString()
+            };
+            
+            annotations.push(annotation);
+            updateTaggedList();
+            clearSelection();
+        }
+
+        function saveEmotionTag() {
+            if (startIdx === null || endIdx === null) {
+                alert('Please select acousteme chunks first');
+                return;
+            }
+            
+            const emotionType = document.getElementById('emotion-type').value || 'neutral';
+            
+            const annotation = {
+                type: 'emotion',
+                genre: currentGenre,
+                tab: currentTab,
+                emotionType: emotionType,
+                startChunk: startIdx,
+                endChunk: endIdx,
+                startTime: acoustemeChunks[startIdx].startTime,
+                endTime: acoustemeChunks[endIdx].endTime,
+                timestamp: new Date().toISOString()
+            };
+            
+            annotations.push(annotation);
+            updateTaggedList();
+            clearSelection();
+        }
+
+        function selectIntensity(level) {
+            document.querySelectorAll('.intensity-btn').forEach(b => b.classList.remove('selected'));
+            event.target.classList.add('selected');
+        }
+
+        function updateTaggedList() {
+            const container = document.getElementById('tagged-items');
+            document.getElementById('tag-count').textContent = `${annotations.length} tagged`;
+            
+            if (annotations.length === 0) {
+                container.innerHTML = '<div class="empty-state">Select acousteme chunks and tag their meaning</div>';
+                return;
+            }
+            
+            container.innerHTML = annotations.map((ann, idx) => `
+                <div class="tagged-item">
+                    <div class="tagged-info">
+                        <div class="tagged-label">${ann.type}: ${ann.category || ann.participantType || ann.emotionType || 'tag'}</div>
+                        <div class="tagged-time">${formatTime(ann.startTime)} - ${formatTime(ann.endTime)}</div>
+                    </div>
+                    <button class="tagged-delete" onclick="deleteTag(${idx})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteTag(index) {
+            annotations.splice(index, 1);
+            updateTaggedList();
+        }
+
+        // ============ EXPORT ============
+        function exportData() {
+            const exportData = {
+                metadata: {
+                    app: 'AViTA Sound-Meaning Bridge',
+                    exportDate: new Date().toISOString(),
+                    totalAnnotations: annotations.length
+                },
+                acoustemeChunks: acoustemeChunks,
+                annotations: annotations
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `avita-export-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            alert(`Exported ${annotations.length} annotations to JSON file`);
+        }
+    </script>
+</body>
+</html>
