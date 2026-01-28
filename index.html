@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AViTA - Semantic Tagging App</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1><i class="fas fa-language"></i> AViTA</h1>
+                <span class="project-name">Ready Vessels Project • Tripod Method</span>
+            </div>
+            <div class="header-right">
+                <button id="save-btn" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save
+                </button>
+                <button id="export-btn" class="btn btn-secondary">
+                    <i class="fas fa-download"></i> Export
+                </button>
+                <span class="session-info" id="session-info">Segment 1</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Left Panel: Audio & Genre -->
+            <div class="left-panel">
+                <!-- Audio Player -->
+                <div class="audio-section">
+                    <h2><i class="fas fa-music"></i> Audio Segment</h2>
+                    <div class="audio-player">
+                        <div class="audio-controls">
+                            <button id="play-btn" class="btn-audio">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button id="pause-btn" class="btn-audio">
+                                <i class="fas fa-pause"></i>
+                            </button>
+                            <button id="rewind-btn" class="btn-audio">
+                                <i class="fas fa-backward"></i>
+                            </button>
+                            <span class="time-display" id="current-time">0:00</span>
+                            <input type="range" id="seek-slider" min="0" max="100" value="0">
+                            <span class="time-display" id="duration">0:00</span>
+                        </div>
+                        <div class="waveform" id="waveform"></div>
+                        <div class="segment-controls">
+                            <button id="mark-start" class="btn-small">
+                                <i class="fas fa-flag"></i> Start
+                            </button>
+                            <button id="mark-end" class="btn-small">
+                                <i class="fas fa-flag-checkered"></i> End
+                            </button>
+                            <span id="segment-range">0:00 - 0:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Genre Selection -->
+                <div class="genre-section">
+                    <h2><i class="fas fa-tags"></i> Speech Type</h2>
+                    <div class="genre-grid" id="genre-grid">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Current Tags -->
+                <div class="tags-section">
+                    <h2><i class="fas fa-tag"></i> Applied Tags</h2>
+                    <div class="tags-container" id="tags-container">
+                        <!-- Tags appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Tagging Interface -->
+            <div class="right-panel">
+                <div class="tab-header">
+                    <button class="tab-btn active" data-tab="events">
+                        <i class="fas fa-bolt"></i> Events
+                    </button>
+                    <button class="tab-btn" data-tab="participants">
+                        <i class="fas fa-users"></i> Participants
+                    </button>
+                    <button class="tab-btn" data-tab="emotion">
+                        <i class="fas fa-heart"></i> Emotion
+                    </button>
+                    <button class="tab-btn" data-tab="discourse">
+                        <i class="fas fa-project-diagram"></i> Discourse
+                    </button>
+                    <button class="tab-btn" data-tab="pragmatic">
+                        <i class="fas fa-comments"></i> Pragmatic
+                    </button>
+                    <button class="tab-btn" data-tab="special" id="special-tab">
+                        <i class="fas fa-star"></i> Special
+                    </button>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="tab-content active" id="events-tab">
+                    <!-- Hierarchically loaded based on genre -->
+                </div>
+
+                <div class="tab-content" id="participants-tab">
+                    <!-- Participant tagging interface -->
+                </div>
+
+                <div class="tab-content" id="emotion-tab">
+                    <!-- Emotion tagging interface -->
+                </div>
+
+                <div class="tab-content" id="discourse-tab">
+                    <!-- Discourse tagging interface -->
+                </div>
+
+                <div class="tab-content" id="pragmatic-tab">
+                    <!-- Pragmatic tagging interface -->
+                </div>
+
+                <div class="tab-content" id="special-tab-content">
+                    <!-- Special features (poetry/proverb) -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Navigation Footer -->
+        <footer class="app-footer">
+            <button id="prev-btn" class="btn-footer">
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+                <span class="progress-text" id="progress-text">0% Complete</span>
+            </div>
+            <button id="next-btn" class="btn-footer">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </footer>
+    </div>
+
+    <!-- Quick Add Modal -->
+    <div class="modal" id="quick-add-modal">
+        <div class="modal-content">
+            <h3>Quick Add Tag</h3>
+            <input type="text" id="quick-tag-input" placeholder="Type tag or select...">
+            <div class="quick-options" id="quick-options">
+                <!-- Auto-suggested tags -->
+            </div>
+            <div class="modal-actions">
+                <button id="cancel-quick" class="btn-small">Cancel</button>
+                <button id="add-quick" class="btn-small btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="ontology-rules.js"></script>
+    <script src="audio-player.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
